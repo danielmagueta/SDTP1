@@ -5,6 +5,7 @@
  */
 package entities;
 
+import genclass.GenericIO;
 import sharedRegions.DepartureAirport;
 import sharedRegions.Plane;
 import sharedRegions.ArrivalAirport;
@@ -52,7 +53,7 @@ public class Passenger extends Thread{
    *   Instantiation of a passenger thread.
    *
    *     @param name thread name
-   *     @param hostessId passenger id
+   *     @param passengerId passenger id
    *     @param dAirport reference to the departure airport
    *     @param plane reference to the plane
    *     @param aAirport reference to the arrival airport
@@ -115,15 +116,19 @@ public class Passenger extends Thread{
     @Override
     public void run ()
     {
-       int passengerID;                                      // customer id
        
-       /*
-       while (bShop.goOn ())                                // check for end of operations
-       { bShop.goToSleep ();                                // the barber sleeps while waiting for a customer to service
-         customerId = bShop.callACustomer ();               // the barber has waken up and calls next customer
-         cutHair ();                                        // the barber cuts the customer hair
-         bShop.receivePayment (customerId);                 // the barber finishes his service and receives payment for it
-       }*/
+       travelToAirport ();                                   // the passenger travels to airport
+       GenericIO.writelnString ("31");
+       dAirport.waitInQueue ();                              // the passenger enters the queue to be checked by the hostess
+       GenericIO.writelnString ("32");
+       dAirport.showDocuments ();                            // the passenger show docuemnts to hostess
+       GenericIO.writelnString ("33");
+       plane.boardThePlane();                                // the passenger boards the plane
+       GenericIO.writelnString ("34");
+       plane.waitForEndOfFligh();                            // the passenger awaits the end of the flight
+       GenericIO.writelnString ("35");
+       aAirport.leaveThePlane();                             // the passenger leaves the plane at the destination point   
+        GenericIO.writelnString ("36");
     }
     
    /**
@@ -139,12 +144,6 @@ public class Passenger extends Thread{
         }
         catch (InterruptedException e) {}
     }
-
-
-
-  
-   
-   
-   
+ 
 
 }

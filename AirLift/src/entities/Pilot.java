@@ -5,6 +5,7 @@
  */
 package entities;
 
+import genclass.GenericIO;
 import sharedRegions.DepartureAirport;
 import sharedRegions.Plane;
 import sharedRegions.ArrivalAirport;
@@ -18,11 +19,6 @@ import sharedRegions.ArrivalAirport;
 
 public class Pilot extends Thread{
     
-    /**
-   *  Pilot identification.
-   */
-    
-    private int pilotId;
     
      /**
    *  Pilot state.
@@ -52,42 +48,20 @@ public class Pilot extends Thread{
    *   Instantiation of a pilot thread.
    *
    *     @param name thread name
-   *     @param hostessId pilot id
    *     @param dAirport reference to the departure airport
    *     @param plane reference to the plane
    *     @param aAirport reference to the arrival airport
    */
 
-   public Pilot (String name, int pilotId, DepartureAirport dAirport, Plane plane, ArrivalAirport aAirport)
+   public Pilot (String name, DepartureAirport dAirport, Plane plane, ArrivalAirport aAirport)
    {
       super (name);
-      this.pilotId = pilotId;
       pilotState = PilotStates.AT_TRANSFER_GATES;
       this.dAirport = dAirport;
       this.plane = plane;
       this.aAirport = aAirport;
    }
    
-    /**
-     *   Set pilot id.
-     *
-     *     @param id pilot id
-     */
-
-    public void setPilotId(int id) {
-        this.pilotId = id;
-    }
-
-    /**
-     *   Get pilot id.
-     *
-     *     @return pilot id
-     */
-
-    public int getPilotId() {
-        return pilotId;
-     }
-
     /**
      *   Set pilot state.
      *
@@ -115,45 +89,29 @@ public class Pilot extends Thread{
     @Override
     public void run ()
     {
-       int passengerID;                                      // customer id
        
-       /*
-       while (bShop.goOn ())                                // check for end of operations
-       { bShop.goToSleep ();                                // the barber sleeps while waiting for a customer to service
-         customerId = bShop.callACustomer ();               // the barber has waken up and calls next customer
-         cutHair ();                                        // the barber cuts the customer hair
-         bShop.receivePayment (customerId);                 // the barber finishes his service and receives payment for it
-       }*/
+       while ( !(aAirport.getnPassengerArrived() == 21))                                 // check for end of operations
+       { dAirport.informPlaneReadyForBoarding ();               // the pilot informs the plane is ready for boarding
+         GenericIO.writelnString ("11");  
+         dAirport.waitForAllInBoard ();                         // the pilot awaits for all the passenger to be in board
+         GenericIO.writelnString ("12");
+         plane.flyToDestinationPoint ();                        // the pilot flies to destination point
+         GenericIO.writelnString ("13");
+         plane.announceArrival();                            // the pilot awaits for all the passengers to deboard the plane 
+         while(plane.getnINF() != aAirport.getnOut());
+         plane.setnINF(0);
+         aAirport.setnOut(0);
+         GenericIO.writelnString ("14");
+         plane.flyToDeparturePoint ();                          // the pilot flies to departure point
+         GenericIO.writelnString ("15");
+         dAirport.parkAtTransferGate();                         //the pilot parks the plane in the departure airport
+         GenericIO.writelnString ("16");
+       }
     }
     
-   /**
-    *  Flying to destination airport.
-    *
-    *  Internal operation.
-    */
    
-    private void flyToDestinationPoint ()
-   {
-      try
-      { sleep ((long) (1 + 100 * Math.random ()));
-      }
-      catch (InterruptedException e) {}
-   }
     
-    /**
-    *  Flying back to initial airport.
-    *
-    *  Internal operation.
-    */
-   
-    private void flyToDeparturePoint ()
-   {
-      try
-      { sleep ((long) (1 + 100 * Math.random ()));
-      }
-      catch (InterruptedException e) {}
-   }
-    
+
   
    
    

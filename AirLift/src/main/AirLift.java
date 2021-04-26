@@ -20,7 +20,7 @@ public class AirLift
 
    public static void main (String [] args)
    {
-      Passenger [] passenger = new Passenger [SimulPar.N];    // array of passenger threads
+      Passenger [] passenger = new Passenger [SimulPar.N];   // array of passenger threads
       Pilot pilot;                                           // pilot thread
       Hostess hostess;                                       // hostess thread
       DepartureAirport dAirport;                             // reference to the departure airport
@@ -52,14 +52,15 @@ public class AirLift
            else success = true;
       } while (!success);
 
-      repos = new GeneralRepos ();      // falta filename
-      dAirport = new DepartureAirport(); //falta argumentos
-      plane = new Plane(); //falta argumentos
-      aAirport = new ArrivalAirport(); //falta argumentos
+      repos = new GeneralRepos (fileName);
+      dAirport = new DepartureAirport(repos);
+      plane = new Plane(repos);
+      aAirport = new ArrivalAirport(repos);
+      pilot = new Pilot ("Pilot", dAirport, plane, aAirport);
+      hostess = new Hostess ("Hostess", dAirport, aAirport, repos);  
       for (int i = 0; i < SimulPar.N; i++)
-        passenger[i] = new Passenger ("Passanger_" + (i+1), i, dAirport, plane, aAirport);
-      pilot = new Pilot ("Pilot", 1, dAirport, plane, aAirport);
-      hostess = new Hostess ("Hostess", 1, dAirport, plane, aAirport);  //possivel que o id saia
+        passenger[i] = new Passenger ("Passenger_" + (i+1), i, dAirport, plane, aAirport);
+      
   
 
      /* start of the simulation */
