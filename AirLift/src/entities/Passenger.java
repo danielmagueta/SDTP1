@@ -118,17 +118,11 @@ public class Passenger extends Thread{
     {
        
        travelToAirport ();                                   // the passenger travels to airport
-       GenericIO.writelnString ("31");
        dAirport.waitInQueue ();                              // the passenger enters the queue to be checked by the hostess
-       GenericIO.writelnString ("32");
        dAirport.showDocuments ();                            // the passenger show docuemnts to hostess
-       GenericIO.writelnString ("33");
        plane.boardThePlane();                                // the passenger boards the plane
-       GenericIO.writelnString ("34");
        plane.waitForEndOfFligh();                            // the passenger awaits the end of the flight
-       GenericIO.writelnString ("35");
        aAirport.leaveThePlane();                             // the passenger leaves the plane at the destination point   
-        GenericIO.writelnString ("36");
     }
     
    /**

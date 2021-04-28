@@ -133,6 +133,8 @@ public class Plane {
       
       access.down();
       ((Pilot) Thread.currentThread()).setPilotState(5);
+      while(nINF != 0){}
+      repos.reportreturning ();
       repos.setPilotState ((Pilot) Thread.currentThread(),5);
       access.up();
       try
@@ -153,19 +155,19 @@ public class Plane {
     public void boardThePlane() 
     {
         access.down();
-        nINF ++;
         repos.addInF();
         int passengerID = ((Passenger) Thread.currentThread()).getPassengerId();     
         try
         { passengerINF.write (passengerID);                    
         }
         catch (MemException e)
-        { GenericIO.writelnString ("Insertion of passenger id in waiting FIFO failed: " + e.getMessage ());
+        { GenericIO.writelnString ("Insertion of passenger in flight failed: " + e.getMessage ());
           access.up ();                
           System.exit (1);
         }
         ((Passenger) Thread.currentThread()).setPassengerState(2);
         repos.setPassengerState(passengerID,2);
+        nINF ++;
         access.up();
     }
     
@@ -180,16 +182,16 @@ public class Plane {
     {
         access.down();
         int passengerID = -1;
-        int inf = repos.getInF();
+        repos.reportArrived ();
         for(int i = 0; i<nINF; i++)
         {
             try
-            { passengerID = passengerINF.read ();                            
+            { passengerID = passengerINF.read ();
               if ((passengerID < 0) || (passengerID >= SimulPar.N))
                  throw new MemException ("illegal passenger id!");
             }
             catch (MemException e)
-            { GenericIO.writelnString ("Retrieval of passenger id from waiting FIFO failed: " + e.getMessage ());
+            { GenericIO.writelnString ("Retrieval of passenger id from flight failed: " + e.getMessage ());
               access.up ();                                                // exit critical region
               System.exit (1);
             }

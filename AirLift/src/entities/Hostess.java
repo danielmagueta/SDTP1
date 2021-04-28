@@ -94,22 +94,19 @@ public class Hostess extends Thread{
     @Override
     public void run ()
     {
-       while (!(aAirport.getnPassengerArrived() == 21))                                 // check for end of operations
+       dAirport.waitPilot();                                             //for the initial lock of the hostess
+        while (!(aAirport.getnPassengerArrived() == SimulPar.N))      // check for end of operations
        { 
-           GenericIO.writelnString ("20");
-           dAirport.prepareForPassBoarding();
-        GenericIO.writelnString ("21");// the hostess awaits for the pilot to indicate that the plane is ready for boarding
+         dAirport.prepareForPassBoarding();                            // the hostess awaits for the pilot to indicate that the plane is ready for boarding
          int passengerID;
-         while( !((repos.getInF()>=SimulPar.MIN) && (repos.getInQ() == 0))  || !(repos.getInF() == SimulPar.MAX) ||  !(repos.getInF() + repos.getPTAL() == SimulPar.MAX)){
-            passengerID = dAirport.checkDocuments();  
-            GenericIO.writelnString ("22");// the hostess checks the passenger documents
-            dAirport.waitForNextPassenger(passengerID);                   // the hostess awaits for the next passanger
-            GenericIO.writelnString ("23");
+         boolean takeOff = false;
+         while(!takeOff){
+            passengerID = dAirport.checkDocuments();                    // the hostess checks the passenger documents
+            takeOff = dAirport.waitForNextPassenger(passengerID);                // the hostess awaits for the next passanger
          }
          dAirport.informPlaneReadyToTakeOff();                         // the hostess informs the pilot that the plane is ready to take off
-         GenericIO.writelnString ("24");
          dAirport.waitForNextFlight();                                 // the hostess awaits for the next flight
-         GenericIO.writelnString ("25");
+
        }
     }
     

@@ -9,6 +9,7 @@ import genclass.GenericIO;
 import sharedRegions.DepartureAirport;
 import sharedRegions.Plane;
 import sharedRegions.ArrivalAirport;
+import main.SimulPar;
 
 /**
  *   Pilot thread.
@@ -90,29 +91,25 @@ public class Pilot extends Thread{
     public void run ()
     {
        
-       while ( !(aAirport.getnPassengerArrived() == 21))                                 // check for end of operations
-       { dAirport.informPlaneReadyForBoarding ();               // the pilot informs the plane is ready for boarding
-         GenericIO.writelnString ("11");  
+       while ( !(aAirport.getnPassengerArrived() == SimulPar.N))                                 // check for end of operations
+       { 
+         dAirport.informPlaneReadyForBoarding ();               // the pilot informs the plane is ready for boarding  
          dAirport.waitForAllInBoard ();                         // the pilot awaits for all the passenger to be in board
-         GenericIO.writelnString ("12");
          plane.flyToDestinationPoint ();                        // the pilot flies to destination point
-         GenericIO.writelnString ("13");
-         plane.announceArrival();                            // the pilot awaits for all the passengers to deboard the plane 
-         while(plane.getnINF() != aAirport.getnOut());
+         plane.announceArrival();                               // the pilot awaits for all the passengers to deboard the plane 
+         while(plane.getnINF() != aAirport.getnOut()){
+             GenericIO.writelnString("haha");
+         }         //wait for all the passengers to deboard
          plane.setnINF(0);
          aAirport.setnOut(0);
-         GenericIO.writelnString ("14");
          plane.flyToDeparturePoint ();                          // the pilot flies to departure point
-         GenericIO.writelnString ("15");
          dAirport.parkAtTransferGate();                         //the pilot parks the plane in the departure airport
-         GenericIO.writelnString ("16");
+         if(aAirport.getnPassengerArrived() == SimulPar.N)
+         {
+             dAirport.endHostess();                             //unblock the hostess thread so she can end
+         }
        }
     }
-    
-   
-    
 
-  
-   
    
 }

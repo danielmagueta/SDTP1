@@ -57,11 +57,12 @@ public class AirLift
       plane = new Plane(repos);
       aAirport = new ArrivalAirport(repos);
       pilot = new Pilot ("Pilot", dAirport, plane, aAirport);
+      pilot.setPriority(6);
       hostess = new Hostess ("Hostess", dAirport, aAirport, repos);  
       for (int i = 0; i < SimulPar.N; i++)
         passenger[i] = new Passenger ("Passenger_" + (i+1), i, dAirport, plane, aAirport);
       
-  
+    
 
      /* start of the simulation */
 

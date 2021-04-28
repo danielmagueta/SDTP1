@@ -75,6 +75,37 @@ public class DepartureAirport {
    
    private boolean endHostess;
    
+   /**
+   *  Number of passengers in queue.
+   */
+   
+   private int nINQ;
+   
+   /**
+   *  Number of passengers in this flight.
+   */
+   
+   private int nINF;
+   
+   /**
+   *  Total number of passengers that have departed.
+   */
+   
+   private int ntotalINF;
+   
+    /**
+   *  Passengers that haven't still arrived at airport and boarded.
+   */
+   
+   private int passengersLEFT;
+   
+      /**
+   *  Bollean for if the hostess can (true) or not (false) take off
+   */
+   
+   private boolean HostessTakeOff;
+ 
+   
 
    /**
    *  Departure Airport instantiation.
@@ -107,23 +138,36 @@ public class DepartureAirport {
       inQueue = new Semaphore [SimulPar.N];
       for (int i = 0; i < SimulPar.N; i++)
         inQueue[i] = new Semaphore ();
+     nINQ = 0;
+     nINF = 0;
+     ntotalINF = 0;
+     passengersLEFT = SimulPar.N;
+     HostessTakeOff = false;
    }
    
-    /**
-   *    Flag for the stop of the hostess thread
-   * 
-   *       @return true or false for the end of the hostess thread
-   */
-    public boolean isEndHostess() {
-        return endHostess;
+
+    
+        public int getnINQ() {
+        return nINQ;
     }
+
+
     
-   
-   
     
-   
 
 //pilot life cicle
+   
+  /**
+   *  Operation for the pilot to unblock the waiting hostess.
+   *
+   *  It is called by a pilot to unlock the hostess thread, so ic can terminate.
+   *
+   */
+    
+    public void endHostess ()
+    {
+        waiting_next_flight.up();
+    }
     
   /**
    *  Operation inform that the plane is ready for boarding.
@@ -140,6 +184,7 @@ public class DepartureAirport {
         repos.setPilotState ((Pilot) Thread.currentThread(),1);
         access.up();
         waiting_next_flight.up();
+
 
     }
     
@@ -204,27 +249,42 @@ public class DepartureAirport {
         access.down();
         try
         { passengerID = passengerFIFO.read ();                            // the hostess calls the passenger to check documents
-          if ((passengerID < 0) || (passengerID >= SimulPar.N))
+            if ((passengerID < 0) || (passengerID >= SimulPar.N))
              throw new MemException ("illegal passenger id!");
         }
         catch (MemException e)
-        { GenericIO.writelnString ("Retrieval of passenger id from waiting FIFO failed: " + e.getMessage ());
+        { GenericIO.writelnString ("CheckDocuments failed: " + e.getMessage ());
           access.up ();                                                // exit critical region
           System.exit (1);
         }
         ((Hostess) Thread.currentThread()).setHostessState(2);
+        nINQ --;
         repos.subtractInQ();
+        repos.reportCheck (passengerID);
         repos.setHostessState ((Hostess) Thread.currentThread(),2);
         access.up();
         inQueue[passengerID].up();
         checking_passenger.down();
         return passengerID;
     }
+
+
+    
+
     
     
-    
-    
-    
+    /**
+   *  Operation for the hostess to be locked in the first iteration.
+   *
+   *  It is called by a hostess in the first iteration so shw waits for the plane to be ready for boarding.
+   * 
+
+   */
+    public void waitPilot ()
+    {
+        waiting_next_flight.down();
+
+    }
     
     /**
    *  Operation for the hostess to wait for a new passenger.
@@ -234,17 +294,32 @@ public class DepartureAirport {
    * @param passengerID id of passenger
    *
    */
-    public void waitForNextPassenger (int passengerID)
+    public boolean waitForNextPassenger (int passengerID)
     {
         access.down();
         ((Hostess) Thread.currentThread()).setHostessState(1);
         repos.setHostessState ((Hostess) Thread.currentThread(),1);
-        access.up();
         inQueue[passengerID].up();
-        if(!((repos.getInF()>=SimulPar.MIN) && (repos.getInQ() == 0))  || !(repos.getInF() == SimulPar.MAX) ||  !(repos.getInF() + repos.getPTAL() == SimulPar.MAX))
-        {
-            waiting_passenger.down();
+        nINF++;
+        ntotalINF++;
+        passengersLEFT--;
+        access.up();
+        access.up();
+        try
+        { sleep ((long) (2));       //ssmall break so the passenger has time to print his final state in the repository, purely aesthetic
         }
+        catch (InterruptedException e) {}
+        if( ((nINF>=SimulPar.MIN) && (nINQ == 0))  || (nINF == SimulPar.MAX) ||  (passengersLEFT == 0))
+        {
+            nINF = 0;
+            return true; 
+        }
+        else
+        {   waiting_passenger.down();
+            return false;
+        }
+        
+        
         
     }
     
@@ -258,6 +333,7 @@ public class DepartureAirport {
     {
         access.down();
         ((Hostess) Thread.currentThread()).setHostessState(3);
+        repos.reportDeparted();
         repos.setHostessState ((Hostess) Thread.currentThread(),3);
         access.up();
         waiting_boarding.up();
@@ -289,13 +365,15 @@ public class DepartureAirport {
    */
     public void waitInQueue ()
     {
+        nINQ ++;
         access.down();
         int passengerID = ((Passenger) Thread.currentThread()).getPassengerId();
         try
-        { passengerFIFO.write (passengerID);                    
+        { passengerFIFO.write (passengerID); 
+        
         }
         catch (MemException e)
-        { GenericIO.writelnString ("Insertion of passenger id in waiting FIFO failed: " + e.getMessage ());
+        { GenericIO.writelnString ("Insertion of passenger id in queue for plane failed: " + e.getMessage ());
           access.up ();                
           System.exit (1);
         }

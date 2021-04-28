@@ -96,17 +96,16 @@ public class ArrivalAirport {
     */
     public void leaveThePlane ()
     {
+        
         access.down();
-        nOut ++;
         repos.subtractInF();
         repos.addPTAL();
-        int inf = repos.getInF();
         ((Passenger) Thread.currentThread()).setPassengerState(3);
         repos.setPassengerState(((Passenger) Thread.currentThread()).getPassengerId(),3);
         nPassengerArrived ++;
+        nOut ++;
         access.up();
-        //if(inf == 0) deboarding.up();
-        GenericIO.writelnString ("inf: " + String.valueOf(inf));
+
 
     }
 

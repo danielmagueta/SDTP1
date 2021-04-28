@@ -414,7 +414,7 @@ public class GeneralRepos
    {
       TextFile log = new TextFile ();                      // instantiation of a text file handler
 
-      if (!log.openForWriting (".", logFileName))
+      if (!log.openForAppending (".", logFileName))
          { GenericIO.writelnString ("The operation of creating the file " + logFileName + " failed!");
            System.exit (1);
          }
@@ -424,5 +424,6 @@ public class GeneralRepos
          { GenericIO.writelnString ("The operation of closing the file " + logFileName + " failed!");
            System.exit (1);
          }
+      nFlight++;
    }
 }
