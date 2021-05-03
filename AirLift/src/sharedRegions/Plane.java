@@ -94,15 +94,6 @@ public class Plane {
     }
     
 
-   
-     /**
-   *    Passengers in flight
-   * 
-   *       @return FIFo of ids of passengers in the flight
-   */
-    public MemFIFO<Integer> getPassengerINF() {
-        return passengerINF;
-    }
     
    /**
     *  Flying to destination airport.

@@ -98,33 +98,7 @@ public class GeneralRepos
       reportInitialStatus ();
    }
    
-   /**
-   *   @return number of passengers in queue.
-   *
-   */
-   
-    public int getInQ() {
-        return InQ;
-    }
-    
-   /**
-   *   
-   *   @return number of passengers in flight.
-   */
-    public int getInF() {
-        return InF;
-    }
-    
-   /**
-   *   @return numbr of passengers that have arrived.
-   *
-   */
-    public int getPTAL() {
-        return PTAL;
-    }
-   
- 
-   
+       
   /**
    *   Add one to the numbers of passengers in queue.
    *
